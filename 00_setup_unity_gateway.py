@@ -1,6 +1,6 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC # 🔐 00 - Setup do Unity Gateway (rodar uma vez, antes do workshop)
+# MAGIC # 🔐 00 - Setup do Unity Gateway (rode primeiro, uma vez só)
 # MAGIC
 # MAGIC ## Por que Unity Gateway?
 # MAGIC Em vez de cada aplicação chamar o modelo "direto", todas as chamadas passam por um **portão único e governado**:
@@ -16,12 +16,14 @@
 # MAGIC Um **model service** é um objeto do Unity Catalog (`catalogo.schema.nome`) que aponta para um modelo.
 # MAGIC Se amanhã quisermos trocar o GPT-OSS-20B por outro modelo, **mudamos só o model service**: o código do agente continua igual.
 # MAGIC
-# MAGIC | Passo | Quem roda | Quando |
+# MAGIC Você vai rodar os 4 passos no **seu** workspace. Leva poucos minutos e só precisa ser feito uma vez:
+# MAGIC
+# MAGIC | Passo | O que faz | Precisa de você? |
 # MAGIC |---|---|---|
-# MAGIC | 1. Criar o model service | Instrutor | Uma vez |
-# MAGIC | 2. Dar permissão aos alunos | Instrutor | Uma vez |
-# MAGIC | 3. Guardar o token pessoal | **Cada aluno** | Uma vez por pessoa |
-# MAGIC | 4. Testar a chamada | Cada aluno | Sempre que quiser |
+# MAGIC | 1. Criar o model service | Cria `workspace.llmops_workshop.assistente_ej_llm` → GPT-OSS-20B | Não, é só rodar |
+# MAGIC | 2. Permissões | Mostra como liberar o model service para outras pessoas | Não, é só rodar |
+# MAGIC | 3. Guardar o token pessoal | Guarda seu PAT num secret scope | **Sim**: gerar e colar o token |
+# MAGIC | 4. Testar a chamada | Primeira chamada ao GPT-OSS-20B pelo Unity Gateway | Não, é só rodar |
 
 # COMMAND ----------
 
@@ -51,7 +53,7 @@ print("Unity Gateway:", GATEWAY_URL)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 1 · Criar o model service (instrutor)
+# MAGIC ## Passo 1 · Criar o model service
 # MAGIC **Pela interface:** menu lateral **AI Gateway → Create → Model service** → catálogo `workspace`, schema `llmops_workshop`,
 # MAGIC nome `assistente_ej_llm` → destino **GPT OSS 20B** → **Create**.
 # MAGIC
@@ -85,9 +87,10 @@ print(json.dumps(servico.as_dict().get("config", {}), indent=2))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 2 · Permissões (instrutor)
+# MAGIC ## Passo 2 · Permissões
 # MAGIC Quem não tem `EXECUTE` no model service **não consegue chamar o modelo** (recebe 404, como se ele não existisse).
-# MAGIC Aqui liberamos para todos os usuários do workspace. Em uma empresa, daríamos só para o grupo do projeto.
+# MAGIC Como você criou o model service, você é o **dono** e já pode usá-lo. Esta célula mostra como liberar o acesso
+# MAGIC para outras pessoas do workspace (por exemplo, o time da sua EJ). Em uma empresa, daríamos só para o grupo do projeto.
 # MAGIC
 # MAGIC > ⏱️ Uma permissão nova leva ~1 minuto para valer no gateway.
 
@@ -111,7 +114,7 @@ display(spark.sql(f"SHOW GRANTS ON MODEL SERVICE {MODEL_SERVICE}"))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo 3 · Guardar seu token pessoal (cada aluno)
+# MAGIC ## Passo 3 · Guardar seu token pessoal
 # MAGIC O Unity Gateway precisa de um token **seu** para saber quem está chamando. Nos notebooks usamos um
 # MAGIC **Personal Access Token (PAT)**; no App, o token é automático (é o do próprio App).
 # MAGIC

@@ -20,33 +20,47 @@ App (OAuth do App)  ──────┘        └─► system.ai_gateway.usa
 
 | Ordem | Arquivo | Conteúdo |
 |---|---|---|
-| 0 | `00_setup_unity_gateway.py` | Cria o model service, dá `EXECUTE` aos alunos, guarda o PAT de cada aluno num secret scope e testa a chamada |
+| 0 | `00_setup_unity_gateway.py` | Cria o model service no Unity Gateway, guarda o seu token (PAT) num secret scope e testa a primeira chamada ao LLM |
 | — | `00_config.py` | Configuração compartilhada (catálogo, model service, token, experimento). Chamado via `%run` |
 | 1 | `01_dataset_avaliacao.py` | Dataset de avaliação (10 exemplos, 4 categorias) como MLflow Evaluation Dataset no UC |
 | 2 | `02_agente.py` | O agente: tool calling, prompt de sistema, tracing, tokens |
 | 3 | `03_avaliacao.py` | `mlflow.genai.evaluate` com 2 juízes nativos + 2 customizados (+1 em código); comparação v1 × v2 |
-| 4 | `04_app.py` + `app/` | Databricks App (backend FastAPI + interface HTML/CSS) com o agente embutido, traces e feedback 👍/👎 |
+| 4 | `04_app.py` + `app/` | Cria e publica, por código, o seu Databricks App (backend FastAPI + interface HTML/CSS) com o agente embutido |
 | 5 | `05_custos_tokens.py` | Tokens por origem (MLflow), visão do Unity Gateway (`system.ai_gateway.usage`), entrada × saída, peso do prompt, projeção de custo |
+
+## Antes de começar
+
+1. **Crie o seu workspace Free Edition** em [databricks.com/learn/free-edition](https://www.databricks.com/learn/free-edition)
+   (é gratuito e leva 1 minuto).
+2. **Traga este repositório para o seu workspace:** menu lateral **Workspace → Create → Git folder**, cole a URL
+   `https://github.com/FernandoDeCome/Workshop_LLMOps.git` e clique em **Create Git folder**.
+   Os arquivos `.py` aparecem como notebooks e a pasta `app/` fica com o código do App.
+3. Abra os notebooks **na ordem** (00 → 05) e rode as células de cima para baixo. Os notebooks usam computação
+   *serverless*: não precisa criar cluster.
+
+Tudo o que é específico do seu workspace (endereço, usuário, pastas) é descoberto automaticamente pelo código.
+Você não precisa trocar nenhuma variável.
 
 ## Agenda (2h)
 
-O conteúdo ocupa ~95 min e deixa **25 min para dúvidas**. Para caber, o instrutor faz antes da aula tudo o que é
-demorado ou só precisa acontecer uma vez (ver "Preparação"): model service, permissões, deploy do App e uma rodada
-completa dos notebooks.
+O conteúdo ocupa ~95 min e deixa **25 min para dúvidas**.
 
-| Horário | Bloco | O que os alunos fazem |
+| Horário | Bloco | O que você faz |
 |---|---|---|
-| 0:00 – 0:10 | Abertura: o que é LLMOps, arquitetura do workshop (diagrama acima) | Assistem |
-| 0:10 – 0:15 | `00_setup_unity_gateway`, passos 3 e 4 | Criam o PAT e testam a chamada ao Unity Gateway |
-| 0:15 – 0:25 | `01_dataset_avaliacao` | Rodam e discutem as categorias de exemplos |
-| 0:25 – 0:45 | `02_agente` | Rodam as seções 1–3 e 5; abrem um trace e olham os tokens |
-| 0:45 – 1:10 | `03_avaliacao` | Rodam a v1 e analisam os juízes na interface. A v2 é **demonstrada pelo instrutor** (já rodada antes) |
-| 1:10 – 1:20 | `04_app` | Usam o App já publicado, dão 👍/👎 e encontram seus traces (`origem = app`) |
-| 1:20 – 1:35 | `05_custos_tokens` | Rodam as seções 2–7 e discutem as alavancas de custo |
+| 0:00 – 0:10 | Abertura: o que é LLMOps e a arquitetura do workshop (diagrama acima) | Cria o Git folder enquanto acompanha |
+| 0:10 – 0:20 | `00_setup_unity_gateway` | Cria o model service, gera e guarda seu token, testa a primeira chamada ao LLM |
+| 0:20 – 0:30 | `01_dataset_avaliacao` | Cria o dataset de avaliação e discute as categorias de exemplos |
+| 0:30 – 0:50 | `02_agente` | Conversa com o agente, abre um trace e olha os tokens |
+| 0:50 – 1:10 | `03_avaliacao` | Avalia o agente com os juízes e compara o prompt completo com o simplificado |
+| 1:10 – 1:20 | `04_app` | Publica o seu App, conversa com ele, dá 👍/👎 e encontra os traces (`origem = app`) |
+| 1:20 – 1:35 | `05_custos_tokens` | Analisa os tokens e discute como reduzir custos |
 | 1:35 – 2:00 | Dúvidas e perguntas | |
 
+> 💡 **Dica de tempo:** o primeiro deploy do App leva de 3 a 5 minutos. Se quiser, rode a célula do `04_app`
+> logo depois de terminar o `02_agente` e siga para o `03_avaliacao` enquanto o App sobe.
+
 **Se o tempo apertar, pule:** seção 4 do `01` (tabela de categorias), seção 4 do `02` (conversa com várias mensagens),
-seção 4 do `03` (só mostre a comparação já pronta), seções 1, 5 e 8 do `05`. Os exercícios ✏️ ficam como lição de casa.
+seções 1, 5 e 8 do `05`. Os exercícios ✏️ ficam como lição de casa.
 
 ```
 app/
@@ -76,7 +90,7 @@ app/
 | Escalar agente e interface separadamente | ❌ | ✅ |
 | Governança da chamada **ao agente** (quem pode usar o agente em si) | Permissão de acesso ao App | Permissão no endpoint + inference tables |
 
-**Por quê:** o agente não guarda estado (o histórico fica no `st.session_state` do App), tem um único consumidor
+**Por quê:** o agente não guarda estado (o histórico fica no navegador, em `static/app.js`), tem um único consumidor
 (o App) e o objetivo é didático. Um endpoint de Model Serving traria passos extras de empacotamento,
 espera de provisionamento e mais uma peça para dar erro, sem trazer benefício que os alunos percebam.
 O que importa para LLMOps continua lá: **o mesmo código é avaliado e publicado**, e todos os traces
@@ -89,25 +103,19 @@ a migração é envolvê-lo em um `mlflow.pyfunc.ResponsesAgent`, registrar no U
 O App passa a chamar o endpoint em vez de importar `agente.py`. Isso pode ser um bom "próximo passo" para
 quem quiser continuar depois do workshop.
 
-## Preparação (antes do workshop)
+## (Opcional) Usando a CLI em vez do Git folder
 
-1. **Conferir o Unity Gateway e o modelo:** no workspace, confirme que o menu **AI Gateway** existe e que o
-   GPT-OSS-20B aparece como destino de model service (`models/system.ai.gpt-oss-20b`, em `00_config.py`).
-2. **Subir os arquivos para o workspace** (opção CLI):
-   ```bash
-   databricks auth login --host https://<seu-workspace>.cloud.databricks.com --profile free-ej
-   databricks workspace import-dir ./workshop_llmops_ej /Users/<seu-email>/workshop_llmops_ej --profile free-ej
-   ```
-   Os `.py` com cabeçalho `# Databricks notebook source` viram notebooks; os arquivos de `app/` continuam arquivos.
-   Alternativa para os alunos: **Workspace → Create → Git folder** com a URL
-   `https://github.com/FernandoDeCome/Workshop_LLMOps.git` (não precisa de CLI).
-3. **Rodar `00_setup_unity_gateway`** (passos 1 e 2 como instrutor; passo 3 e 4 com seu próprio PAT).
-   No dia, cada aluno roda só os passos 3 e 4.
-4. **Rodar 01 → 05 uma vez** para validar (e popular traces para a aula de custos).
-5. **Criar e publicar o App** (`04_app.py`, passos 1-3) com as *resource keys* `model` (Unity Gateway model service)
-   e `experiment`. Dê permissão **Can use** no App para os alunos e anote a URL para compartilhar.
-6. **Rodar a v2 do `03_avaliacao`** com antecedência, para só mostrar a comparação durante a aula.
-7. ⚠️ **No dia:** Apps do Free Edition param após 24h. Clique em **Start** no App antes de começar.
+Se preferir trabalhar no seu computador, dá para subir os arquivos com a [Databricks CLI](https://docs.databricks.com/aws/en/dev-tools/cli/install):
+
+```bash
+databricks auth login --host https://<seu-workspace>.cloud.databricks.com --profile free-ej
+databricks workspace import-dir ./Workshop_LLMOps /Users/<seu-email>/workshop_llmops_ej --profile free-ej
+```
+
+Os `.py` com cabeçalho `# Databricks notebook source` viram notebooks; os arquivos de `app/` continuam arquivos.
+
+> ⚠️ **Free Edition:** o App para automaticamente após 24h. Para ligar de novo, rode a célula do `04_app`
+> ou clique em **Start** em **Compute → Apps**.
 
 ## Problemas comuns
 
@@ -117,7 +125,9 @@ quem quiser continuar depois do workshop.
 | `404` / "does not exist" ao chamar o LLM | Falta `EXECUTE` no model service, permissão ainda propagando (~1 min) ou nome errado |
 | `401` / `403` nos notebooks | PAT ausente/expirado → refazer o passo 3 do `00_setup_unity_gateway` (e rodar `%run ./00_config` de novo) |
 | LLM responde sem usar ferramentas | Modelo com *tool calling* fraco → testar outro modelo e comparar no notebook 03 |
-| App não registra traces | Recurso `experiment` ausente/permissão diferente de *Can edit*, ou *resource key* diferente do `app.yaml` |
-| App: `404`/`403` ao chamar o LLM | Recurso `model` (Unity Gateway model service) ausente ou *resource key* diferente do `app.yaml` |
+| App não registra traces ou dá `404`/`403` ao chamar o LLM | Recursos do App fora do esperado → rode de novo a célula do `04_app`, que recria os recursos `model` e `experiment` |
+| Deploy do App falhou | Veja os logs em **Compute → Apps → assistente-ej → Logs** |
+| Erro de limite ao criar o App | O Free Edition permite até 3 Apps por conta → apague um App que não usa em **Compute → Apps** |
+| `429` / `REQUEST_LIMIT_EXCEEDED` | Limite de chamadas por segundo do Free Edition → espere alguns segundos e rode a célula de novo |
 | `system.ai_gateway.usage` vazia | Atraso de alguns minutos; ou a tabela não está disponível no workspace |
 | `create_dataset`/`make_judge` não existem | Versão antiga do MLflow → rodar a célula `%pip install -U "mlflow[databricks]>=3.4"` |

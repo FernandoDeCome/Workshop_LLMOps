@@ -10,8 +10,7 @@
 # MAGIC - **Backend em Python (FastAPI)**: recebe a pergunta, chama o agente e devolve a resposta. São só 3 rotas (`/api/chat`, `/api/feedback`, `/api/info`).
 # MAGIC - **Interface em HTML + CSS** (com um pouco de JavaScript para enviar as mensagens): sem build, sem TypeScript.
 # MAGIC
-# MAGIC > ⏱️ **No workshop:** o instrutor já publicou o App antes da aula. Abra a URL, converse e dê 👍/👎.
-# MAGIC > O passo a passo abaixo é para você reproduzir depois, no seu próprio workspace.
+# MAGIC > ⏱️ Neste notebook você cria e publica **o seu** App com uma célula de código. O primeiro deploy leva de 3 a 5 minutos.
 # MAGIC
 # MAGIC ## Arquitetura escolhida: agente **dentro** do App
 # MAGIC ```
@@ -52,51 +51,69 @@ print(f"Experimento (recurso 'experiment'):  {EXPERIMENT_PATH}  (id = {EXPERIMEN
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Passo a passo (pela interface)
+# MAGIC ## 1. Criar e publicar o App
+# MAGIC O App roda com uma **identidade própria** (service principal). Ao criá-lo, dizemos a quais recursos essa identidade
+# MAGIC pode acessar. No App **não usamos PAT**: o agente pega automaticamente o token OAuth do service principal.
 # MAGIC
-# MAGIC ### 1. Criar o App
-# MAGIC 1. Menu lateral **+ New → App** (ou **Compute → Apps → Create app**).
-# MAGIC 2. Escolha **Create a custom app**. Nome: `assistente-ej` (só letras minúsculas, números e `-`).
-# MAGIC
-# MAGIC ### 2. Adicionar os recursos (App resources)
-# MAGIC O App roda com uma **identidade própria** (service principal). Precisamos dar a ela acesso ao model service do
-# MAGIC Unity Gateway e ao MLflow. No App **não usamos PAT**: o agente pega automaticamente o token OAuth do service principal.
-# MAGIC
-# MAGIC | Tipo de recurso | Selecionar | Permissão | Resource key (**exatamente** assim) |
+# MAGIC | Recurso | O que é | Permissão | Resource key |
 # MAGIC |---|---|---|---|
-# MAGIC | Unity Gateway model service | `workspace.llmops_workshop.assistente_ej_llm` | Can query (EXECUTE) | `model` |
-# MAGIC | MLflow experiment | `llmops_workshop_ej` | Can edit | `experiment` |
+# MAGIC | Unity Gateway model service | `workspace.llmops_workshop.assistente_ej_llm` | `EXECUTE` | `model` |
+# MAGIC | MLflow experiment | `llmops_workshop_ej` | `CAN_EDIT` | `experiment` |
 # MAGIC
-# MAGIC > A *resource key* é o nome usado no `app.yaml` (`valueFrom: model`). Se forem diferentes, o App não acha o recurso.
+# MAGIC A *resource key* é o nome usado no `app.yaml` (`valueFrom: model`). É por ela que o App descobre qual model service
+# MAGIC e qual experimento usar.
 # MAGIC
-# MAGIC ### 3. Fazer o deploy
-# MAGIC Clique em **Deploy** e informe como *source code path* a pasta `app` impressa acima
-# MAGIC (`/Workspace/Users/<seu-email>/.../app`). O primeiro deploy leva alguns minutos (instala as bibliotecas).
-# MAGIC
-# MAGIC ### 4. Testar
-# MAGIC Abra a URL do App, faça perguntas e dê 👍/👎. Depois vá em **Experiments → llmops_workshop_ej → Traces**
-# MAGIC e filtre pela tag `origem = app`: lá estão as conversas reais, com tokens e feedback.
-# MAGIC
-# MAGIC ⚠️ **Free Edition:** Apps param automaticamente após 24h. Antes do workshop, clique em **Start** no App.
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC ## (Opcional) Deploy via código
-# MAGIC Depois de **criar o App e configurar os recursos** pela interface (passos 1 e 2), dá para refazer o deploy
-# MAGIC por código — útil quando alteramos o `agente.py`.
+# MAGIC A célula abaixo cria o App (ou atualiza, se ele já existir) e faz o deploy do código da pasta `app/`.
+# MAGIC Pode rodar de novo sempre que alterar o `agente.py`: ela só publica a nova versão.
 
 # COMMAND ----------
 
 from databricks.sdk import WorkspaceClient
-from databricks.sdk.service.apps import AppDeployment
+from databricks.sdk.errors import NotFound
+from databricks.sdk.service.apps import App, AppDeployment
 
-NOME_APP = "assistente-ej"
+NOME_APP = "assistente-ej"  # só letras minúsculas, números e "-"
 
 w = WorkspaceClient()
+definicao = App.from_dict({
+    "name": NOME_APP,
+    "description": "Workshop LLMOps: Assistente Engenhar Jr. (GPT-OSS-20B via Unity Gateway)",
+    "resources": [
+        {"name": "model", "uc_securable": {"securable_full_name": MODEL_SERVICE,
+                                            "securable_type": "MODEL_SERVICE", "permission": "EXECUTE"}},
+        {"name": "experiment", "experiment": {"experiment_id": EXPERIMENT_ID, "permission": "CAN_EDIT"}},
+    ],
+})
+
+try:
+    w.apps.get(NOME_APP)
+    w.apps.update(name=NOME_APP, app=definicao)
+    print(f"• App {NOME_APP} já existia: recursos atualizados")
+except NotFound:
+    print(f"Criando o App {NOME_APP} (1 a 2 minutos)...")
+    w.apps.create_and_wait(app=definicao)
+    print("✅ App criado")
+
+if w.apps.get(NOME_APP).compute_status.state.value != "ACTIVE":  # App parado (ex.: após 24h no Free Edition)
+    print("Ligando o App...")
+    w.apps.start_and_wait(NOME_APP)
+
+print("Publicando o código (3 a 5 minutos no primeiro deploy)...")
 deploy = w.apps.deploy_and_wait(app_name=NOME_APP, app_deployment=AppDeployment(source_code_path=APP_DIR))
-print(f"Status: {deploy.status.state} - {deploy.status.message}")
-print(f"URL:    {w.apps.get(NOME_APP).url}")
+print(f"Status: {deploy.status.state.value} - {deploy.status.message}")
+print(f"\n👉 Abra o seu App: {w.apps.get(NOME_APP).url}")
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## 2. Testar
+# MAGIC Abra a URL impressa acima, faça perguntas e dê 👍/👎. Depois vá em **Experiments → llmops_workshop_ej → Traces**
+# MAGIC e filtre pela tag `origem = app`: lá estão as suas conversas, com tokens e feedback.
+# MAGIC
+# MAGIC > Se o deploy falhar, veja os logs em **Compute → Apps → assistente-ej → Logs**.
+# MAGIC
+# MAGIC ⚠️ **Free Edition:** Apps param automaticamente após 24h. Para ligar de novo, rode a célula acima
+# MAGIC ou clique em **Start** em **Compute → Apps**.
 
 # COMMAND ----------
 
