@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistente Engenhar Jr.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <aside class="barra-lateral">
+    <div class="marca">
+      <img src="/static/apps-icon-full-color.svg" alt="" width="32" height="32">
+      <span id="nome-empresa">Engenhar Jr.</span>
+    </div>
+    <p id="descricao" class="texto-suave"></p>
+
+    <h2>Serviços</h2>
+    <ul id="servicos"></ul>
+
+    <div class="cartao-tokens">
+      <span class="rotulo">Tokens nesta conversa</span>
+      <span id="tokens-sessao" class="numero">0</span>
+    </div>
+    <p class="texto-suave">Modelo via Unity Gateway:<br><code id="modelo"></code></p>
+
+    <button id="nova-conversa" class="botao-secundario">Nova conversa</button>
+  </aside>
+
+  <main class="chat">
+    <header>
+      <h1>Assistente Engenhar Jr.</h1>
+      <p class="texto-suave">Tire dúvidas sobre nossos serviços ou peça um orçamento.</p>
+    </header>
+
+    <section id="mensagens" class="mensagens"></section>
+
+    <form id="formulario" class="entrada">
+      <input id="pergunta" type="text" autocomplete="off"
+             placeholder="Ex.: Quanto custa um projeto elétrico de 50 horas?" required>
+      <button type="submit" class="botao-primario">Enviar</button>
+    </form>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

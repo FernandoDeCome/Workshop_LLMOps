@@ -1,0 +1,5 @@
+mlflow[databricks]>=3.4
+openai
+databricks-sdk
+fastapi
+uvicorn

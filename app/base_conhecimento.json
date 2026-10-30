@@ -1,0 +1,89 @@
+{
+  "empresa": {
+    "nome": "Engenhar Jr.",
+    "descricao": "Empresa Júnior de Engenharia formada por alunos de graduação, que oferece serviços de engenharia com qualidade profissional e preço acessível, sempre sob supervisão de professores orientadores.",
+    "contato": "contato@engenharjr.exemplo.br",
+    "whatsapp": "(11) 90000-0000",
+    "horario_atendimento": "Segunda a sexta-feira, das 9h às 18h"
+  },
+  "servicos": [
+    {
+      "id": "projeto_estrutural",
+      "nome": "Projeto Estrutural Residencial",
+      "descricao": "Dimensionamento de estruturas de concreto armado para residências de até 3 pavimentos, incluindo plantas de forma e armação.",
+      "valor_hora": 120,
+      "prazo_tipico": "30 dias úteis",
+      "palavras_chave": ["estrutura", "estrutural", "concreto", "casa", "residencia", "viga", "pilar", "laje"]
+    },
+    {
+      "id": "eficiencia_energetica",
+      "nome": "Consultoria em Eficiência Energética",
+      "descricao": "Diagnóstico do consumo de energia de residências, comércios e pequenas indústrias, com plano de ações para reduzir a conta de luz e estudo de viabilidade de energia solar.",
+      "valor_hora": 100,
+      "prazo_tipico": "15 dias úteis",
+      "palavras_chave": ["energia", "energetica", "eficiencia", "solar", "conta de luz", "consumo", "fotovoltaico"]
+    },
+    {
+      "id": "projeto_eletrico",
+      "nome": "Projeto Elétrico Predial",
+      "descricao": "Projeto de instalações elétricas de baixa tensão para residências e pequenos comércios, incluindo quadro de cargas e diagrama unifilar.",
+      "valor_hora": 90,
+      "prazo_tipico": "20 dias úteis",
+      "palavras_chave": ["eletrico", "eletrica", "instalacao", "tomada", "quadro", "unifilar", "fiacao"]
+    },
+    {
+      "id": "prototipagem_3d",
+      "nome": "Prototipagem e Impressão 3D",
+      "descricao": "Modelagem CAD e impressão 3D de protótipos e peças. O material de impressão é cobrado à parte, conforme o peso da peça.",
+      "valor_hora": 80,
+      "prazo_tipico": "7 dias úteis",
+      "palavras_chave": ["prototipo", "prototipagem", "impressao", "3d", "cad", "peca", "modelagem"]
+    },
+    {
+      "id": "analise_dados",
+      "nome": "Análise de Dados e Dashboards",
+      "descricao": "Organização de dados, criação de indicadores e dashboards para apoiar decisões de negócio de pequenas e médias empresas.",
+      "valor_hora": 110,
+      "prazo_tipico": "15 dias úteis",
+      "palavras_chave": ["dados", "dashboard", "indicadores", "planilha", "bi", "analise", "relatorio"]
+    }
+  ],
+  "regras_orcamento": {
+    "desconto_volume_pct": 10,
+    "horas_minimas_desconto": 40,
+    "acrescimo_urgencia_pct": 25,
+    "explicacao": "Projetos com 40 horas ou mais recebem 10% de desconto. Projetos urgentes (prazo reduzido pela metade) têm acréscimo de 25%, aplicado sobre o valor já com desconto. Não existem outros descontos."
+  },
+  "faq": [
+    {
+      "titulo": "Processo de contratação",
+      "conteudo": "O processo tem 5 etapas: (1) reunião de diagnóstico gratuita de 30 minutos; (2) envio da proposta comercial em até 5 dias úteis; (3) assinatura do contrato; (4) execução do projeto com reuniões de acompanhamento; (5) entrega final com 30 dias de suporte pós-entrega.",
+      "palavras_chave": ["contratar", "contratacao", "processo", "etapas", "proposta", "como funciona", "diagnostico"]
+    },
+    {
+      "titulo": "Formas de pagamento",
+      "conteudo": "O pagamento é feito em duas parcelas: 50% na assinatura do contrato e 50% na entrega do projeto. Aceitamos PIX e boleto bancário.",
+      "palavras_chave": ["pagamento", "pagar", "pix", "boleto", "parcela", "parcelas", "entrada"]
+    },
+    {
+      "titulo": "Responsabilidade técnica (ART)",
+      "conteudo": "Todos os projetos são supervisionados por um professor orientador da universidade, que é o engenheiro responsável e assina a ART (Anotação de Responsabilidade Técnica) junto ao CREA.",
+      "palavras_chave": ["art", "crea", "responsabilidade", "assina", "professor", "orientador", "engenheiro responsavel"]
+    },
+    {
+      "titulo": "Revisões incluídas",
+      "conteudo": "Cada projeto inclui 2 rodadas de revisão sem custo adicional. Revisões extras são cobradas pelo valor-hora do serviço.",
+      "palavras_chave": ["revisao", "revisoes", "alteracao", "ajuste", "mudanca"]
+    },
+    {
+      "titulo": "Suporte pós-entrega",
+      "conteudo": "Após a entrega, o cliente tem 30 dias de suporte gratuito para tirar dúvidas sobre o projeto.",
+      "palavras_chave": ["suporte", "pos-entrega", "garantia", "duvidas", "depois da entrega"]
+    },
+    {
+      "titulo": "Serviços que NÃO oferecemos",
+      "conteudo": "A Engenhar Jr. não executa obras, não vende equipamentos e não realiza projetos de alta tensão, industriais de grande porte ou de usinas. Atuamos apenas com os 5 serviços do nosso portfólio.",
+      "palavras_chave": ["obra", "execucao", "equipamento", "alta tensao", "usina", "industrial", "nao fazem"]
+    }
+  ]
+}

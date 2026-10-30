@@ -1,0 +1,106 @@
+/* Visual inspirado na identidade da Databricks: fundo Oat, texto Navy, destaque Lava. */
+:root {
+  --navy: #1B3139;
+  --lava: #FF3621;
+  --lava-escuro: #E02E1B;
+  --oat-claro: #F9F7F4;
+  --oat-medio: #EEEDE9;
+  --linha: #E4E2DD;
+  --texto: #3A3838;
+  --texto-suave: #5A5755;
+  --verde: #00A972;
+  --sombra: 0 2px 6px rgba(27, 49, 57, 0.08), 0 8px 20px rgba(27, 49, 57, 0.08);
+  --raio: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  display: flex;
+  height: 100vh;
+  font-family: "DM Sans", system-ui, sans-serif;
+  font-size: 16px;
+  color: var(--texto);
+  background: var(--oat-claro);
+}
+
+h1 { font-size: 32px; color: var(--navy); margin: 0 0 8px; letter-spacing: -0.01em; }
+h2 { font-size: 16px; color: var(--navy); margin: 24px 0 8px; }
+code { font-family: "DM Mono", monospace; font-size: 12px; word-break: break-all; }
+.texto-suave { color: var(--texto-suave); font-size: 14px; line-height: 1.5; }
+
+/* ---------- Barra lateral ---------- */
+.barra-lateral {
+  width: 300px;
+  padding: 24px;
+  background: var(--oat-medio);
+  border-right: 1px solid var(--linha);
+  overflow-y: auto;
+}
+.marca { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: 700; color: var(--navy); }
+#servicos { list-style: none; padding: 0; margin: 0; font-size: 14px; }
+#servicos li { padding: 8px 0; border-bottom: 1px solid var(--linha); }
+#servicos strong { display: block; color: var(--navy); font-weight: 500; }
+
+.cartao-tokens {
+  margin: 24px 0 8px;
+  padding: 16px;
+  background: #fff;
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+}
+.cartao-tokens .rotulo { display: block; font-size: 12px; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.06em; }
+.cartao-tokens .numero { font-size: 32px; font-weight: 700; color: var(--navy); }
+
+/* ---------- Chat ---------- */
+.chat { flex: 1; display: flex; flex-direction: column; padding: 32px 40px 24px; min-width: 0; }
+.mensagens { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 24px 0; }
+
+.mensagem {
+  max-width: 720px;
+  padding: 16px 20px;
+  border-radius: var(--raio);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.mensagem.user { align-self: flex-end; background: var(--navy); color: #fff; }
+.mensagem.assistant { align-self: flex-start; background: #fff; box-shadow: var(--sombra); }
+.mensagem.pensando { color: var(--texto-suave); font-style: italic; }
+.mensagem.erro { background: #FDECEA; color: #98102A; }
+
+.detalhes {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 8px;
+  border-top: 1px solid var(--linha); font-size: 12px; color: var(--texto-suave); white-space: normal;
+}
+.detalhes .espaco { flex: 1; }
+.botao-feedback {
+  border: 1px solid var(--linha); background: var(--oat-claro); border-radius: 4px;
+  padding: 4px 8px; cursor: pointer; font-size: 14px;
+}
+.botao-feedback:hover { border-color: var(--navy); }
+.botao-feedback.escolhido { background: var(--verde); border-color: var(--verde); color: #fff; }
+.botao-feedback:disabled { cursor: default; }
+
+/* ---------- Entrada ---------- */
+.entrada { display: flex; gap: 8px; }
+.entrada input {
+  flex: 1; padding: 16px; font: inherit; border: 1px solid var(--linha); border-radius: var(--raio);
+  background: #fff; box-shadow: var(--sombra);
+}
+.entrada input:focus { outline: 2px solid var(--lava); outline-offset: -1px; }
+
+.botao-primario, .botao-secundario {
+  font: inherit; font-weight: 500; border-radius: var(--raio); cursor: pointer; transition: background 150ms ease-out;
+}
+.botao-primario { padding: 0 24px; border: none; background: var(--lava); color: #fff; }
+.botao-primario:hover { background: var(--lava-escuro); }
+.botao-primario:disabled { background: var(--texto-suave); cursor: wait; }
+.botao-secundario { width: 100%; margin-top: 16px; padding: 12px; background: #fff; border: 1px solid var(--navy); color: var(--navy); }
+.botao-secundario:hover { background: var(--navy); color: #fff; }
+
+@media (max-width: 800px) {
+  body { flex-direction: column; height: auto; }
+  .barra-lateral { width: 100%; }
+  .chat { height: 100vh; padding: 16px; }
+}

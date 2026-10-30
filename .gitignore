@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Segredos e configurações locais
+.env
+.databrickscfg
+
+# Databricks / editores / sistema
+.databricks/
+.idea/
+.vscode/
+.DS_Store
